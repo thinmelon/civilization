@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style/common.css">
+    <title>乡风文明</title>
+</head>
+<body>
+<div class="background">
+    <div id="bar" class="bar"></div>
+    <div class="menu"></div>
+    <div id="menu"></div>
+    <div id="notices_board" class="notices_board">
+        <div id="notices_board_bar" class="notices_board_bar"></div>
+        <div id="notices_board_content" class="notices_board_content"></div>
+        <div class="list-item-more"></div>
+    </div>
+    <div id="cursor"></div>
+    <div id="debug-message"></div>
+</div>
+</body>
+<script type="application/javascript" src="../utility/assistant.js"></script>
+<script type="application/javascript" src="../utility/async.js"></script>
+<script type="application/javascript" src="../cms/cms.config.js"></script>
+<script type="application/javascript" src="../cms/cms.api.js"></script>
+<script type="application/javascript" src="../module/bar.module.js"></script>
+<script type="application/javascript" src="../wrapper/bar.wrapper.js"></script>
+<script type="application/javascript" src="../module/menu.module.js"></script>
+<script type="application/javascript" src="../module/list.module.js"></script>
+<script type="application/javascript" src="../module/video.module.js"></script>
+<script type="application/javascript" src="../module/cursor.module.js"></script>
+<script type="application/javascript" src="../module/transfer.module.js"></script>
+<script type="application/javascript">
+    function MenuComponent() {
+        MenuModule.call(this);
+
+        this.menuPageArray = [{
+            itemsPerLine: [2, 2],           // 每行所包含的元素数量
+            menuItemArray: [
+                {
+                    left: 78,
+                    top: 180,
+                    width: 382,
+                    height: 213,
+                    bgImageSrc: 'url(../images/culture/1.png) no-repeat',
+                    resourceId: cmsConfig.cultureResourceIdArray[1].resourceId
+                },
+                {
+                    left: 470,
+                    top: 180,
+                    width: 382,
+                    height: 213,
+                    bgImageSrc: 'url(../images/culture/2.png) no-repeat',
+                    resourceId: cmsConfig.cultureResourceIdArray[2].resourceId
+                },
+                {
+                    left: 78,
+                    top: 402,
+                    width: 382,
+                    height: 213,
+                    bgImageSrc: 'url(../images/culture/3.png) no-repeat',
+                    resourceId: cmsConfig.cultureResourceIdArray[3].resourceId
+                },
+                {
+                    left: 470,
+                    top: 402,
+                    width: 382,
+                    height: 213,
+                    bgImageSrc: 'url(../images/culture/4.png) no-repeat',
+                    resourceId: cmsConfig.cultureResourceIdArray[4].resourceId
+                }
+            ]
+        }];
+    }
+
+    function ListComponent() {
+        ListModule.call(this);
+
+        // 属性
+        this.focusPos = 0;
+        this.boardLeft = 868;
+        this.boardTop = 170;
+        this.boardWidth = 364;
+        this.boardHeight = 450;
+        this.noticesBoardBarWidth = 349;
+        this.noticesBoardBarHeight = 40;
+        this.noticesBoardBarText = '最新动态';
+        this.itemLeft = 873;
+        this.itemTop = 212;
+        this.itemWidth = 339;
+        this.itemHeight = 30;
+        this.itemMoreLeft = 1078;
+        this.itemMoreTop = 570;
+        this.itemMoreWidth = 131;
+        this.itemMoreHeight = 42;
+        this.listItemNum = 8;
+        this.resourceId = cmsConfig.cultureResourceIdArray[5].resourceId;
+
+        // 方法
+    }
+
+    function CursorComponent(bar, menu, list) {
+        CursorModule.call(this);
+
+        // 属性
+        this.focusArea = 5;
+        this.bar = bar;
+        this.bar.focusPos = 7;
+        this.menu = menu;
+        this.list = list;
+        this.fileName = 'PG-ONE';
+    }
+
+    function TransferComponent(cursor) {
+        var that = this,
+            postfix = '',
+            params = [];
+
+        TransferModule.call(this);
+        // 属性
+        this.cursor = cursor;
+
+        // 方法
+        this.moveX = function (direction) {
+            this.cursor.focusOut();
+            switch (this.cursor.focusArea) {
+                case 0:         // 菜单
+                    if (this.cursor.menu.moveX(direction) < 0) {
+                        this.cursor.focusArea = 2;
+                    }
+                    break;
+                case 2:         //  列表
+                    this.cursor.focusArea = 5;
+                    break;
+                case 5:         // 栏目
+                    this.remove('PG-ONE');
+                    this.cursor.bar.moveX(direction);
+                    break;
+                default:
+                    break;
+            }
+            this.cursor.focusOn();
+        };
+
+        this.moveY = function (direction) {
+            this.cursor.focusOut();
+            switch (this.cursor.focusArea) {
+                case 0:         // 菜单
+                    if (-1 === this.cursor.menu.moveY(direction)) {
+                        if (direction < 0) {
+                            this.cursor.focusArea = 5;
+                        }
+                    }
+                    break;
+                case 2:         //  列表
+                    if (-1 === this.cursor.list.moveY(direction)) {
+                        if (direction < 0) {
+                            this.cursor.focusArea = 5;
+                        }
+                    }
+                    break;
+                case 5:         // 栏目
+                    this.cursor.focusArea = 0;
+                    break;
+                default:
+                    break;
+            }
+            this.cursor.focusOn();
+        };
+
+        this.doBack = function () {
+            window.location.href = 'http://10.215.0.10:80/ui3/ui3/loading.htm?opk=4';
+        };
+
+        this.doSelect = function () {
+            var
+                postfix = '',
+                params;
+
+            this.remove(this.cursor.fileName);
+            switch (this.cursor.focusArea) {
+                case 0:         // 菜单
+//                    if (this.cursor.menu.focusPosX === 0 && this.cursor.menu.focusPosY === 0) {
+//                        params =
+//                            {
+//                                /**
+//                                 * 一级页面
+//                                 */
+//                                'PG-ONE': {
+//                                    focusArea: this.cursor.focusArea,
+//                                    focusPosX: this.cursor.menu.focusPosX,
+//                                    focusPosY: this.cursor.menu.focusPosY
+//                                },
+//                                'VIDEO': {
+//                                    backURL: this.backUrl(),
+//                                    focusArea: this.cursor.focusArea,
+//                                    focusPosX: this.cursor.menu.focusPosX,
+//                                    focusPosY: this.cursor.menu.focusPosY,
+//                                    resourceId: cmsConfig.indexResourceIdArray[1].resourceId
+//                                }
+//                            };
+//                        postfix = this.package(params);
+//                        window.location.href = 'video.html' + postfix;
+//                    }
+                    break;
+                case 5:         // 栏目
+//                    this.doBack();
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        this.onKeyDown = function (event) {
+            var code = getKeyCode(event);
+
+            switch (code) {
+                case 'KEY_NUMBER1':
+                    that.toggle();
+                    return false;
+                case 'KEY_UP':
+                    that.moveY(-1);
+                    return false;
+                case 'KEY_DOWN':
+                    that.moveY(1);
+                    return false;
+                case 'KEY_LEFT':
+                    that.moveX(-1);
+                    return false;
+                case 'KEY_RIGHT':
+                    that.moveX(1);
+                    return false;
+                case 'KEY_SELECT':
+                    that.doSelect();
+                    return false;
+                case 'KEY_EXIT':
+                case 'KEY_BACK':
+                    that.doBack();
+                    return false;
+                default:
+                    break;
+            }
+        };
+    }
+
+    window.onload = function () {
+        var
+            barComponent = new BarComponent(),
+            menuComponent = new MenuComponent(),
+            listComponent = new ListComponent(),
+            cursorComponent = new CursorComponent(barComponent, menuComponent, listComponent),
+            transferComponent = new TransferComponent(cursorComponent);
+
+        /**
+         *  添加按键事件处理
+         */
+        document.onkeydown = transferComponent.onKeyDown;           //  按键事件处理
+
+        /**
+         *  初始化各模块
+         */
+//        document.getElementById('debug-message').innerHTML += '<br/>' + '======================  启动初始化  ======================';
+        transferComponent.init();
+        barComponent.init();
+        menuComponent.init();
+        listComponent.init(function () {
+            /**
+             *  光标定位
+             */
+            cursorComponent.focusOn();
+        });
+    };
+</script>
+</html>
