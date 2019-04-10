@@ -187,31 +187,31 @@
             this.remove(this.cursor.fileName);
             switch (this.cursor.focusArea) {
                 case 0:         // 菜单
-//                    if (this.cursor.menu.focusPosX === 0 && this.cursor.menu.focusPosY === 0) {
-//                        params =
-//                            {
-//                                /**
-//                                 * 一级页面
-//                                 */
-//                                'PG-ONE': {
-//                                    focusArea: this.cursor.focusArea,
-//                                    focusPosX: this.cursor.menu.focusPosX,
-//                                    focusPosY: this.cursor.menu.focusPosY
-//                                },
-//                                'VIDEO': {
-//                                    backURL: this.backUrl(),
-//                                    focusArea: this.cursor.focusArea,
-//                                    focusPosX: this.cursor.menu.focusPosX,
-//                                    focusPosY: this.cursor.menu.focusPosY,
-//                                    resourceId: cmsConfig.indexResourceIdArray[1].resourceId
-//                                }
-//                            };
-//                        postfix = this.package(params);
-//                        window.location.href = 'video.html' + postfix;
-//                    }
+                    if (this.cursor.menu.focusPosX === 0 && this.cursor.menu.focusPosY === 0) {
+                        params =
+                            {
+                                /**
+                                 * 一级页面
+                                 */
+                                'PG-ONE': {
+                                    focusArea: this.cursor.focusArea,
+                                    focusPosX: this.cursor.menu.focusPosX,
+                                    focusPosY: this.cursor.menu.focusPosY
+                                },
+                                'VIDEO': {
+                                    backURL: this.backUrl(),
+                                    focusArea: this.cursor.focusArea,
+                                    focusPosX: this.cursor.menu.focusPosX,
+                                    focusPosY: this.cursor.menu.focusPosY,
+                                    resourceId: cmsConfig.indexResourceIdArray[1].resourceId
+                                }
+                            };
+                        postfix = this.package(params);
+                        window.location.href = 'video.html' + postfix;
+                    }
                     break;
-                case 5:         // 栏目
-//                    this.doBack();
+                case 2:
+                    this.cursor.list.doSelect(this, this.cursor.focusArea, this.cursor.list.focusPos, 'index.html', this.cursor.list.resourceId);
                     break;
                 default:
                     break;
